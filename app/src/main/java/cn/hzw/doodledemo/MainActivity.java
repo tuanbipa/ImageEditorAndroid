@@ -15,6 +15,7 @@ import cn.forward.androids.utils.LogUtil;
 import cn.hzw.doodle.DoodleActivity;
 import cn.hzw.doodle.DoodleParams;
 import cn.hzw.doodle.DoodleView;
+import cn.hzw.doodle.ImageEditorActivity;
 import cn.hzw.doodledemo.guide.DoodleGuideActivity;
 import cn.hzw.imageselector.ImageLoader;
 import cn.hzw.imageselector.ImageSelectorActivity;
@@ -82,7 +83,9 @@ public class MainActivity extends Activity {
                 // 是否支持缩放item
                 params.mSupportScaleItem = true;
                 // 启动涂鸦页面
-                DoodleActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
+                //DoodleActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
+
+                ImageEditorActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
             }
         } else if (requestCode == REQ_CODE_DOODLE) {
             if (data == null) {
