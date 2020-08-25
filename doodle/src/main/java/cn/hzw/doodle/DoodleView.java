@@ -37,10 +37,13 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Looper;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +59,7 @@ import cn.hzw.doodle.core.IDoodleItem;
 import cn.hzw.doodle.core.IDoodlePen;
 import cn.hzw.doodle.core.IDoodleShape;
 import cn.hzw.doodle.core.IDoodleTouchDetector;
+import cn.hzw.doodle.util.SaveStore;
 
 import static cn.hzw.doodle.util.DrawUtil.drawCircle;
 import static cn.hzw.doodle.util.DrawUtil.drawRect;
@@ -149,6 +153,8 @@ public class DoodleView extends FrameLayout implements IDoodle {
     private Canvas mDoodleBitmapCanvas;
     private BackgroundView mBackgroundView;
 
+    private Context mContext;
+
     public DoodleView(Context context, Bitmap bitmap, IDoodleListener listener) {
         this(context, bitmap, false, listener, null);
     }
@@ -175,6 +181,7 @@ public class DoodleView extends FrameLayout implements IDoodle {
      */
     public DoodleView(Context context, Bitmap bitmap, boolean optimizeDrawing, IDoodleListener listener, IDoodleTouchDetector defaultDetector) {
         super(context);
+        this.mContext = context;
         setClipChildren(false);
 
         mBitmap = bitmap;
@@ -634,10 +641,26 @@ public class DoodleView extends FrameLayout implements IDoodle {
             items = new ArrayList<>(mItemStack);
             items.removeAll(mItemStackOnViewCanvas);
         }
+
+        saveItemsToJson(items);
+
         for (IDoodleItem item : items) {
             item.draw(mDoodleBitmapCanvas);
         }
     }
+
+    private void saveItemsToJson(List<IDoodleItem> items){
+        for (IDoodleItem item : items) {
+            if (item instanceof DoodlePath){
+                String json = ((DoodlePath)item).toJson();
+                Log.d(TAG, "Saved json: " + json);
+
+                SaveStore.saveString("DoodlePath", json, this.mContext);
+            }
+        }
+
+    }
+
 
     private void refreshWithBackground() {
         addFlag(FLAG_REFRESH_BACKGROUND);
@@ -763,6 +786,13 @@ public class DoodleView extends FrameLayout implements IDoodle {
         }
 
         refresh();
+    }
+
+    @Override
+    public void restoreDrawingItems(List<IDoodleItem> itemList){
+        for (IDoodleItem item : itemList){
+            notifyItemFinishedDrawing(item);
+        }
     }
 
     /**

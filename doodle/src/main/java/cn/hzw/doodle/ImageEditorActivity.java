@@ -5,12 +5,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +49,7 @@ import cn.hzw.doodle.core.IDoodleTouchDetector;
 import cn.hzw.doodle.dialog.ColorPickerDialog;
 import cn.hzw.doodle.dialog.DialogController;
 import cn.hzw.doodle.imagepicker.ImageSelectorView;
+import cn.hzw.doodle.util.SaveStore;
 
 /**
  * 涂鸦界面，根据DoodleView的接口，提供页面交互
@@ -116,7 +120,6 @@ public class ImageEditorActivity extends Activity {
     private View mBtnHidePanel, mSettingsPanel;
     private View mSelectedEditContainer;
     private TextView mItemScaleTextView;
-    private View mBtnColor, mColorContainer;
 
     private View mShapeContainer, mPenContainer;
     private View mBtnUndo;
@@ -137,6 +140,8 @@ public class ImageEditorActivity extends Activity {
 
     private int mMosaicLevel = -1;
 
+    ColorDrawable colorDrawable;
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -153,6 +158,9 @@ public class ImageEditorActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StatusBarUtil.setStatusBarTranslucent(this, true, false);
+
+        colorDrawable = new ColorDrawable(ContextCompat.getColor(this, R.color.brush_color));
+
         if (mDoodleParams == null) {
             mDoodleParams = getIntent().getExtras().getParcelable(KEY_PARAMS);
         }
@@ -459,9 +467,6 @@ public class ImageEditorActivity extends Activity {
         mEditBtn = findViewById(R.id.doodle_selectable_edit);
         mRedoBtn = findViewById(R.id.btn_redo);
 
-        mBtnColor = ImageEditorActivity.this.findViewById(R.id.btn_set_color);
-        mColorContainer = ImageEditorActivity.this.findViewById(R.id.btn_set_color_container);
-
         mDoodleView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -533,42 +538,19 @@ public class ImageEditorActivity extends Activity {
             mDoodle.setPen(DoodlePen.BRUSH);
         }  else if (v.getId() == R.id.btn_pen_text) {
             mDoodle.setPen(DoodlePen.TEXT);
+
+            String json = SaveStore.getString("DoodlePath", "", this);
+            if (!TextUtils.isEmpty(json)){
+                DoodlePath mCurrDoodlePath = DoodlePath.toShape(mDoodle, json);
+                List<IDoodleItem> iDoodleItems = new ArrayList<>();
+                iDoodleItems.add(mCurrDoodlePath);
+                mDoodle.restoreDrawingItems(iDoodleItems);
+            }
+
         } else if (v.getId() == R.id.doodle_btn_brush_edit) {
             mDoodleView.setEditMode(!mDoodleView.isEditMode());
         } else if (v.getId() == R.id.btn_undo) {
             mDoodle.undo();
-        } else if (v.getId() == R.id.btn_set_color_container) {
-            DoodleColor color = null;
-            if (mDoodle.getColor() instanceof DoodleColor) {
-                color = (DoodleColor) mDoodle.getColor();
-            }
-            if (color == null) {
-                return;
-            }
-            if (!(DoodleParams.getDialogInterceptor() != null
-                    && DoodleParams.getDialogInterceptor().onShow(ImageEditorActivity.this, mDoodle, DoodleParams.DialogType.COLOR_PICKER))) {
-                boolean fullScreen = (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
-                int themeId;
-                if (fullScreen) {
-                    themeId = android.R.style.Theme_Translucent_NoTitleBar_Fullscreen;
-                } else {
-                    themeId = android.R.style.Theme_Translucent_NoTitleBar;
-                }
-                new ColorPickerDialog(ImageEditorActivity.this,
-                        new ColorPickerDialog.OnColorChangedListener() {
-                            public void colorChanged(int color, int size) {
-                                mDoodle.setColor(new DoodleColor(color));
-                                mDoodle.setSize(size);
-                            }
-
-                            @Override
-                            public void colorChanged(Drawable color, int size) {
-                                Bitmap bitmap = ImageUtils.getBitmapFromDrawable(color);
-                                mDoodle.setColor(new DoodleColor(bitmap));
-                                mDoodle.setSize(size);
-                            }
-                        }, themeId).show(mDoodleView, mBtnColor.getBackground(), Math.min(mDoodleView.getWidth(), mDoodleView.getHeight()));
-            }
         } else if (v.getId() == R.id.doodle_btn_hide_panel) {
             mSettingsPanel.removeCallbacks(mHideDelayRunnable);
             mSettingsPanel.removeCallbacks(mShowDelayRunnable);
@@ -702,21 +684,10 @@ public class ImageEditorActivity extends Activity {
             if (pen == DoodlePen.BITMAP || pen == DoodlePen.TEXT) {
                 mEditBtn.setVisibility(View.VISIBLE); // edit btn
                 mShapeContainer.setVisibility(GONE);
-                if (pen == DoodlePen.BITMAP) {
-                    mColorContainer.setVisibility(GONE);
-                } else {
-                    mColorContainer.setVisibility(VISIBLE);
-                }
             } else if (pen == DoodlePen.MOSAIC) {
                 mShapeContainer.setVisibility(VISIBLE);
-                mColorContainer.setVisibility(GONE);
             } else {
                 mShapeContainer.setVisibility(VISIBLE);
-                if (pen == DoodlePen.COPY || pen == DoodlePen.ERASER) {
-                    mColorContainer.setVisibility(GONE);
-                } else {
-                    mColorContainer.setVisibility(VISIBLE);
-                }
             }
             setSingleSelected(mBtnPenIds.values(), mBtnPenIds.get(pen));
 
@@ -728,7 +699,6 @@ public class ImageEditorActivity extends Activity {
                 }
                 if (isEditMode()) {
                     mShapeContainer.setVisibility(GONE);
-                    mColorContainer.setVisibility(GONE);
                 }
             } else {
                 mShapeContainer.setVisibility(GONE);
@@ -736,7 +706,7 @@ public class ImageEditorActivity extends Activity {
             }
 
             if (pen == DoodlePen.BRUSH) {
-                Drawable colorBg = mBtnColor.getBackground();
+                Drawable colorBg = colorDrawable;
                 if (colorBg instanceof ColorDrawable) {
                     mDoodle.setColor(new DoodleColor(((ColorDrawable) colorBg).getColor()));
                 } else {
@@ -753,14 +723,14 @@ public class ImageEditorActivity extends Activity {
             } else if (pen == DoodlePen.ERASER) {
 
             } else if (pen == DoodlePen.TEXT) {
-                Drawable colorBg = mBtnColor.getBackground();
+                Drawable colorBg = colorDrawable;
                 if (colorBg instanceof ColorDrawable) {
                     mDoodle.setColor(new DoodleColor(((ColorDrawable) colorBg).getColor()));
                 } else {
                     mDoodle.setColor(new DoodleColor(((BitmapDrawable) colorBg).getBitmap()));
                 }
             } else if (pen == DoodlePen.BITMAP) {
-                Drawable colorBg = mBtnColor.getBackground();
+                Drawable colorBg = colorDrawable;
                 if (colorBg instanceof ColorDrawable) {
                     mDoodle.setColor(new DoodleColor(((ColorDrawable) colorBg).getColor()));
                 } else {
@@ -803,9 +773,9 @@ public class ImageEditorActivity extends Activity {
             if (doodleColor != null
                     && canChangeColor(pen)) {
                 if (doodleColor.getType() == DoodleColor.Type.COLOR) {
-                    mBtnColor.setBackgroundColor(doodleColor.getColor());
+
                 } else if (doodleColor.getType() == DoodleColor.Type.BITMAP) {
-                    mBtnColor.setBackgroundDrawable(new BitmapDrawable(doodleColor.getBitmap()));
+
                 }
 
                 if (mTouchGestureListener.getSelectedItem() != null) {
@@ -860,12 +830,11 @@ public class ImageEditorActivity extends Activity {
             super.setEditMode(editMode);
             mBtnEditMode.setSelected(editMode);
             if (editMode) {
-                Toast.makeText(ImageEditorActivity.this, R.string.doodle_edit_mode, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ImageEditorActivity.this, R.string.doodle_edit_mode, Toast.LENGTH_LONG).show();
                 mLastIsDrawableOutside = mDoodle.isDrawableOutside(); // save
                 mDoodle.setIsDrawableOutside(true);
                 mPenContainer.setVisibility(GONE);
                 mShapeContainer.setVisibility(GONE);
-                mColorContainer.setVisibility(GONE);
                 mBtnUndo.setVisibility(GONE);
             } else {
                 if (mLastIsDrawableOutside != null) { // restore

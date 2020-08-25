@@ -10,6 +10,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
@@ -90,6 +92,26 @@ public class DoodlePath extends DoodleRotatableItemBase {
         return mSxy;
     }
 
+    public static DoodlePath toShape(IDoodle doodle, String json) {
+        SavingObject savingObject = new Gson().fromJson(json, SavingObject.class);
+        if (savingObject != null){
+            DoodlePath path = new DoodlePath(doodle);
+            path.setPen(savingObject.getmPen());
+            path.setShape(savingObject.getmShape());
+            path.setSize(savingObject.getSize());
+            path.setColor(new DoodleColor(savingObject.getColor()));
+
+            path.updateXY(savingObject.getSx(), savingObject.getSy(), savingObject.getDx(), savingObject.getDy());
+            if (path.getPen() == DoodlePen.COPY) {
+                if (doodle instanceof DoodleView) {
+                    path.mCopyLocation = DoodlePen.COPY.getCopyLocation().copy();
+                }
+            }
+            return path;
+        }
+        return null;
+    }
+
     public static DoodlePath toShape(IDoodle doodle, float sx, float sy, float dx, float dy) {
         DoodlePath path = new DoodlePath(doodle);
         path.setPen(doodle.getPen().copy());
@@ -104,6 +126,24 @@ public class DoodlePath extends DoodleRotatableItemBase {
             }
         }
         return path;
+    }
+
+    public String toJson(){
+        DoodleColor color = null;
+        if (this.getColor() instanceof DoodleColor) {
+            color = (DoodleColor) this.getColor();
+        }
+        SavingObject savingObject = new SavingObject(
+                this.getPen(),
+                this.getShape(),
+                this.getSize(),
+                color.getColor(),
+                this.getSxy().x,
+                this.getSxy().y,
+                this.getDxy().x,
+                this.getDxy().y);
+        String json = new Gson().toJson(savingObject);
+        return json;
     }
 
     public static DoodlePath toPath(IDoodle doodle, Path p) {

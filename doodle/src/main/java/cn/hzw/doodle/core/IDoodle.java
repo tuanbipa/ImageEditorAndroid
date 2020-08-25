@@ -309,4 +309,5 @@ public interface IDoodle {
      */
     public void refresh();
 
+    public void restoreDrawingItems(List<IDoodleItem> itemList);
 }

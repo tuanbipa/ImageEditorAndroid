@@ -2,4 +2,5 @@
 <resources>
     <color name="doodle_btn_pressed_color">#ffffd943</color>
     <color name="doodle_btn_border">#88cccccc</color>
+    <color name="brush_color">#88FF0000</color>
 </resources>
