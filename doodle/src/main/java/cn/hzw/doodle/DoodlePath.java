@@ -92,24 +92,20 @@ public class DoodlePath extends DoodleRotatableItemBase {
         return mSxy;
     }
 
-    public static DoodlePath toShape(IDoodle doodle, String json) {
-        SavingObject savingObject = new Gson().fromJson(json, SavingObject.class);
-        if (savingObject != null){
-            DoodlePath path = new DoodlePath(doodle);
-            path.setPen(DoodlePen.valueOf(savingObject.getmPen()));
-            path.setShape(DoodleShape.valueOf(savingObject.getmShape()));
-            path.setSize(savingObject.getSize());
-            path.setColor(new DoodleColor(savingObject.getColor()));
+    public static DoodlePath fromElement(IDoodle doodle, DrawPathElement element) {
+        DoodlePath path = new DoodlePath(doodle);
+        path.setPen(DoodlePen.valueOf(element.getmPen()));
+        path.setShape(DoodleShape.valueOf(element.getmShape()));
+        path.setSize(element.getSize());
+        path.setColor(new DoodleColor(element.getColor()));
 
-            path.updateXY(savingObject.getSx(), savingObject.getSy(), savingObject.getDx(), savingObject.getDy());
-            if (path.getPen() == DoodlePen.COPY) {
-                if (doodle instanceof DoodleView) {
-                    path.mCopyLocation = DoodlePen.COPY.getCopyLocation().copy();
-                }
+        path.updateXY(element.getSx(), element.getSy(), element.getDx(), element.getDy());
+        if (path.getPen() == DoodlePen.COPY) {
+            if (doodle instanceof DoodleView) {
+                path.mCopyLocation = DoodlePen.COPY.getCopyLocation().copy();
             }
-            return path;
         }
-        return null;
+        return path;
     }
 
     public static DoodlePath toShape(IDoodle doodle, float sx, float sy, float dx, float dy) {
@@ -128,12 +124,13 @@ public class DoodlePath extends DoodleRotatableItemBase {
         return path;
     }
 
-    public String toJson(){
+    public DrawPathElement toElement(){
         DoodleColor color = null;
         if (this.getColor() instanceof DoodleColor) {
             color = (DoodleColor) this.getColor();
         }
-        SavingObject savingObject = new SavingObject(
+
+        DrawPathElement drawPathElement = new DrawPathElement(
                 this.getPen().toString(),
                 this.getShape().toString(),
                 this.getSize(),
@@ -142,8 +139,7 @@ public class DoodlePath extends DoodleRotatableItemBase {
                 this.getSxy().y,
                 this.getDxy().x,
                 this.getDxy().y);
-        String json = new Gson().toJson(savingObject);
-        return json;
+        return drawPathElement;
     }
 
     public static DoodlePath toPath(IDoodle doodle, Path p) {

@@ -48,7 +48,7 @@ public class ScaleGestureItemDemo extends Activity {
             @Override
             public void onReady(IDoodle doodle) {
                 doodle.setSize(40 * doodle.getUnitSize());
-                IDoodleSelectableItem item = new DoodleText(doodle, "Hello, world", doodle.getSize(), doodle.getColor(), 10, doodleView.getBitmap().getHeight()/2);
+                IDoodleSelectableItem item = new DoodleText(doodle, "Hello, world", doodle.getSize(), doodle.getColor(), 10, doodleView.getBitmap().getHeight()/2, null);
                 touchGestureListener.setSelectedItem(item);
                 doodle.addItem(item);
             }
@@ -74,7 +74,7 @@ public class ScaleGestureItemDemo extends Activity {
                                 if (TextUtils.isEmpty(text)) {
                                     return;
                                 }
-                                IDoodleSelectableItem item = new DoodleText(doodle, text, doodle.getSize(), doodle.getColor().copy(), x, y);
+                                IDoodleSelectableItem item = new DoodleText(doodle, text, doodle.getSize(), doodle.getColor().copy(), x, y, null);
                                 doodle.addItem(item);
                                 touchGestureListener.setSelectedItem(item);
                                 doodle.refresh();

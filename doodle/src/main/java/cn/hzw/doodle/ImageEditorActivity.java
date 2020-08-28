@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -25,6 +27,10 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -139,7 +145,7 @@ public class ImageEditorActivity extends Activity {
     private Map<IDoodlePen, Float> mPenSizeMap = new HashMap<>(); //保存每个画笔对应的最新大小
 
     private int mMosaicLevel = -1;
-
+    Typeface typeface;
     //ColorDrawable colorDrawable;
 
     @Override
@@ -160,6 +166,8 @@ public class ImageEditorActivity extends Activity {
         StatusBarUtil.setStatusBarTranslucent(this, true, false);
 
         //colorDrawable = new ColorDrawable(ContextCompat.getColor(this, R.color.brush_color));
+
+        typeface = ResourcesCompat.getFont(this, R.font.sansserif);
 
         if (mDoodleParams == null) {
             mDoodleParams = getIntent().getExtras().getParcelable(KEY_PARAMS);
@@ -273,12 +281,30 @@ public class ImageEditorActivity extends Activity {
                 mPenSizeMap.put(DoodlePen.BITMAP, DEFAULT_BITMAP_SIZE * mDoodle.getUnitSize());
 
                 //Load shapes if needed
-                String json = SaveStore.getString("DoodlePath", "", ImageEditorActivity.this);
+                String json = SaveStore.getString("DrawBaseElement", "", ImageEditorActivity.this);
                 if (!TextUtils.isEmpty(json)){
-                    DoodlePath mCurrDoodlePath = DoodlePath.toShape(mDoodle, json);
-                    List<IDoodleItem> iDoodleItems = new ArrayList<>();
-                    iDoodleItems.add(mCurrDoodlePath);
-                    mDoodle.restoreDrawingItems(iDoodleItems);
+
+                    try{
+                        Gson gson = new GsonBuilder().registerTypeAdapter(DrawExtraElement.class, new ElementJsonDeserializer()).create();
+                        List<DrawExtraElement> extraElements = gson.fromJson(json, new TypeToken<List<DrawExtraElement>>(){}.getType());
+                        if (extraElements != null){
+                            List<IDoodleItem> iDoodleItems = new ArrayList<>();
+                            for (DrawExtraElement drawExtraElement : extraElements){
+                                if (drawExtraElement instanceof DrawPathElement){
+                                    DoodlePath mCurrDoodlePath = DoodlePath.fromElement(mDoodle, (DrawPathElement)drawExtraElement);
+                                    iDoodleItems.add(mCurrDoodlePath);
+                                }
+                                if (drawExtraElement instanceof DrawTextElement){
+                                    DoodleText doodleText = DoodleText.fromElement(mDoodle, (DrawTextElement) drawExtraElement, typeface);
+                                    iDoodleItems.add(doodleText);
+                                }
+                            }
+                            mDoodle.restoreDrawingItems(iDoodleItems);
+                        }
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                 }
             }
         });
@@ -394,7 +420,7 @@ public class ImageEditorActivity extends Activity {
                     return;
                 }
                 if (doodleText == null) {
-                    IDoodleSelectableItem item = new DoodleText(mDoodle, text, mDoodle.getSize(), mDoodle.getColor().copy(), x, y);
+                    IDoodleSelectableItem item = new DoodleText(mDoodle, text, mDoodle.getSize(), mDoodle.getColor().copy(), x, y, typeface);
                     mDoodle.addItem(item);
                     mTouchGestureListener.setSelectedItem(item);
                 } else {

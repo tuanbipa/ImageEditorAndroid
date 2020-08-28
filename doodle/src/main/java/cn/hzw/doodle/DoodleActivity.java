@@ -383,7 +383,7 @@ public class DoodleActivity extends Activity {
                     return;
                 }
                 if (doodleText == null) {
-                    IDoodleSelectableItem item = new DoodleText(mDoodle, text, mDoodle.getSize(), mDoodle.getColor().copy(), x, y);
+                    IDoodleSelectableItem item = new DoodleText(mDoodle, text, mDoodle.getSize(), mDoodle.getColor().copy(), x, y, null);
                     mDoodle.addItem(item);
                     mTouchGestureListener.setSelectedItem(item);
                 } else {

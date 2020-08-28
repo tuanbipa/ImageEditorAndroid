@@ -44,7 +44,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -652,17 +654,24 @@ public class DoodleView extends FrameLayout implements IDoodle {
     private void saveItemsToJson(List<IDoodleItem> items){
         if (items.size() == 0) {
             //Clear paths that saved
-            SaveStore.saveString("DoodlePath", "", this.mContext);
+            SaveStore.saveString("DrawBaseElement", "", this.mContext);
             return;
         }
+        List<DrawExtraElement> extraElements = new ArrayList<>();
         for (IDoodleItem item : items) {
             if (item instanceof DoodlePath){
-                String json = ((DoodlePath)item).toJson();
-                Log.d(TAG, "Saved json: " + json);
-
-                SaveStore.saveString("DoodlePath", json, this.mContext);
+                DrawPathElement drawPathElement = ((DoodlePath)item).toElement();
+                extraElements.add(drawPathElement);
+            }
+            if (item instanceof DoodleText){
+                DoodleText doodleText = (DoodleText)item;
+                DrawTextElement drawTextElement = doodleText.toElement();
+                extraElements.add(drawTextElement);
             }
         }
+        Type listType = new TypeToken<List<DrawExtraElement>>() {}.getType();
+        String json = new Gson().toJson(extraElements, listType);
+        SaveStore.saveString("DrawBaseElement", json, this.mContext);
     }
 
 
