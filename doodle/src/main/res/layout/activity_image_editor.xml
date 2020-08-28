@@ -177,6 +177,22 @@
                             tools:visibility="visible" />
                     </LinearLayout>
 
+                    <FrameLayout
+                        android:id="@+id/btn_set_color_container"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="@dimen/doodle_margin"
+                        android:background="@drawable/doodle_btn_effect_rect_line"
+                        android:onClick="onClick"
+                        android:padding="2dp">
+
+                        <ImageView
+                            android:id="@+id/btn_set_color"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:background="#f00" />
+                    </FrameLayout>
+
                 </LinearLayout>
 
             </FrameLayout>
