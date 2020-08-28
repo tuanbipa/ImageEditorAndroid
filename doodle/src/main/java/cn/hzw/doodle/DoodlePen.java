@@ -63,4 +63,13 @@ public enum DoodlePen implements IDoodlePen {
             }
         }
     }
+
+    public static DoodlePen toMyEnum (String myEnumString) {
+        try {
+            return valueOf(myEnumString);
+        } catch (Exception ex) {
+            // For error cases
+            return BRUSH;
+        }
+    }
 }

@@ -96,8 +96,8 @@ public class DoodlePath extends DoodleRotatableItemBase {
         SavingObject savingObject = new Gson().fromJson(json, SavingObject.class);
         if (savingObject != null){
             DoodlePath path = new DoodlePath(doodle);
-            path.setPen(savingObject.getmPen());
-            path.setShape(savingObject.getmShape());
+            path.setPen(DoodlePen.valueOf(savingObject.getmPen()));
+            path.setShape(DoodleShape.valueOf(savingObject.getmShape()));
             path.setSize(savingObject.getSize());
             path.setColor(new DoodleColor(savingObject.getColor()));
 
@@ -134,8 +134,8 @@ public class DoodlePath extends DoodleRotatableItemBase {
             color = (DoodleColor) this.getColor();
         }
         SavingObject savingObject = new SavingObject(
-                this.getPen(),
-                this.getShape(),
+                this.getPen().toString(),
+                this.getShape().toString(),
                 this.getSize(),
                 color.getColor(),
                 this.getSxy().x,

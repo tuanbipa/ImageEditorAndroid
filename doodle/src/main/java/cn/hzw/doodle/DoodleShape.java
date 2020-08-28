@@ -38,4 +38,14 @@ public enum DoodleShape implements IDoodleShape {
     public void drawHelpers(Canvas canvas, IDoodle doodle) {
 
     }
+
+
+    public static DoodleShape toMyEnum (String myEnumString) {
+        try {
+            return valueOf(myEnumString);
+        } catch (Exception ex) {
+            // For error cases
+            return LINE;
+        }
+    }
 }

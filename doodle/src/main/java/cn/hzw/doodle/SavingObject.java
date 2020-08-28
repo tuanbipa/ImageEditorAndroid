@@ -9,8 +9,8 @@ import cn.hzw.doodle.core.IDoodleShape;
 
 public class SavingObject {
 
-    private IDoodlePen mPen; // 画笔类型
-    private IDoodleShape mShape; // 画笔形状
+    private String mPen; // 画笔类型
+    private String mShape; // 画笔形状
     float size;
     int color;
     float sx;
@@ -18,7 +18,7 @@ public class SavingObject {
     float dx;
     float dy;
 
-    public SavingObject(IDoodlePen mPen, IDoodleShape mShape, float size, int color, float sx, float sy, float dx, float dy) {
+    public SavingObject(String mPen, String mShape, float size, int color, float sx, float sy, float dx, float dy) {
         this.mPen = mPen;
         this.mShape = mShape;
         this.size = size;
@@ -29,11 +29,11 @@ public class SavingObject {
         this.dy = dy;
     }
 
-    public IDoodlePen getmPen() {
+    public String getmPen() {
         return mPen;
     }
 
-    public IDoodleShape getmShape() {
+    public String getmShape() {
         return mShape;
     }
 

@@ -650,6 +650,11 @@ public class DoodleView extends FrameLayout implements IDoodle {
     }
 
     private void saveItemsToJson(List<IDoodleItem> items){
+        if (items.size() == 0) {
+            //Clear paths that saved
+            SaveStore.saveString("DoodlePath", "", this.mContext);
+            return;
+        }
         for (IDoodleItem item : items) {
             if (item instanceof DoodlePath){
                 String json = ((DoodlePath)item).toJson();
@@ -658,7 +663,6 @@ public class DoodleView extends FrameLayout implements IDoodle {
                 SaveStore.saveString("DoodlePath", json, this.mContext);
             }
         }
-
     }
 
 
@@ -791,8 +795,12 @@ public class DoodleView extends FrameLayout implements IDoodle {
     @Override
     public void restoreDrawingItems(List<IDoodleItem> itemList){
         for (IDoodleItem item : itemList){
-            notifyItemFinishedDrawing(item);
+            if (!mOptimizeDrawing) {
+                return;
+            }
+            addItem(item);
         }
+        refresh();
     }
 
     /**
@@ -1196,7 +1204,7 @@ public class DoodleView extends FrameLayout implements IDoodle {
         mRedoItemStack.clear();
     }
 
-    private void addItemInner(IDoodleItem item) {
+    private void  addItemInner(IDoodleItem item) {
         if (item == null) {
             throw new RuntimeException("item is null");
         }

@@ -271,6 +271,15 @@ public class ImageEditorActivity extends Activity {
                 mPenSizeMap.put(DoodlePen.ERASER, mDoodle.getSize());
                 mPenSizeMap.put(DoodlePen.TEXT, DEFAULT_TEXT_SIZE * mDoodle.getUnitSize());
                 mPenSizeMap.put(DoodlePen.BITMAP, DEFAULT_BITMAP_SIZE * mDoodle.getUnitSize());
+
+                //Load shapes if needed
+                String json = SaveStore.getString("DoodlePath", "", ImageEditorActivity.this);
+                if (!TextUtils.isEmpty(json)){
+                    DoodlePath mCurrDoodlePath = DoodlePath.toShape(mDoodle, json);
+                    List<IDoodleItem> iDoodleItems = new ArrayList<>();
+                    iDoodleItems.add(mCurrDoodlePath);
+                    mDoodle.restoreDrawingItems(iDoodleItems);
+                }
             }
         });
 
@@ -538,15 +547,6 @@ public class ImageEditorActivity extends Activity {
             mDoodle.setPen(DoodlePen.BRUSH);
         }  else if (v.getId() == R.id.btn_pen_text) {
             mDoodle.setPen(DoodlePen.TEXT);
-
-            String json = SaveStore.getString("DoodlePath", "", this);
-            if (!TextUtils.isEmpty(json)){
-                DoodlePath mCurrDoodlePath = DoodlePath.toShape(mDoodle, json);
-                List<IDoodleItem> iDoodleItems = new ArrayList<>();
-                iDoodleItems.add(mCurrDoodlePath);
-                mDoodle.restoreDrawingItems(iDoodleItems);
-            }
-
         } else if (v.getId() == R.id.doodle_btn_brush_edit) {
             mDoodleView.setEditMode(!mDoodleView.isEditMode());
         } else if (v.getId() == R.id.btn_undo) {
