@@ -86,6 +86,9 @@ public class DoodleParams implements Parcelable {
      */
     public boolean mOptimizeDrawing = true;
 
+
+    public String mImageMetadata;
+
     public static final Creator<DoodleParams> CREATOR = new Creator<DoodleParams>() {
         @Override
         public DoodleParams createFromParcel(Parcel in) {
@@ -104,7 +107,7 @@ public class DoodleParams implements Parcelable {
             params.mPaintColor = in.readInt();
             params.mSupportScaleItem = in.readInt() == 1;
             params.mOptimizeDrawing = in.readInt() == 1;
-
+            params.mImageMetadata = in.readString();
             return params;
         }
 
@@ -130,7 +133,7 @@ public class DoodleParams implements Parcelable {
         dest.writeInt(mPaintColor);
         dest.writeInt(mSupportScaleItem ? 1 : 0);
         dest.writeInt(mOptimizeDrawing ? 1 : 0);
-
+        dest.writeString(mImageMetadata);
     }
 
     @Override

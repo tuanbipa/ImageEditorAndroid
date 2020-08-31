@@ -37,7 +37,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Looper;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +60,6 @@ import cn.hzw.doodle.core.IDoodleItem;
 import cn.hzw.doodle.core.IDoodlePen;
 import cn.hzw.doodle.core.IDoodleShape;
 import cn.hzw.doodle.core.IDoodleTouchDetector;
-import cn.hzw.doodle.util.SaveStore;
 
 import static cn.hzw.doodle.util.DrawUtil.drawCircle;
 import static cn.hzw.doodle.util.DrawUtil.drawRect;
@@ -76,7 +74,7 @@ public class DoodleView extends FrameLayout implements IDoodle {
     public static final String TAG = "DoodleView";
     public final static float MAX_SCALE = 5f; // 最大缩放倍数
     public final static float MIN_SCALE = 0.25f; // 最小缩放倍数
-    public final static int DEFAULT_SIZE = 6; // 默认画笔大小
+    public final static int DEFAULT_SIZE = 3; // 默认画笔大小
 
     public static final int ERROR_INIT = -1;
     public static final int ERROR_SAVE = -2;
@@ -644,19 +642,14 @@ public class DoodleView extends FrameLayout implements IDoodle {
             items.removeAll(mItemStackOnViewCanvas);
         }
 
-        saveItemsToJson(items);
-
         for (IDoodleItem item : items) {
             item.draw(mDoodleBitmapCanvas);
         }
     }
 
-    private void saveItemsToJson(List<IDoodleItem> items){
-        if (items.size() == 0) {
-            //Clear paths that saved
-            SaveStore.saveString("DrawBaseElement", "", this.mContext);
-            return;
-        }
+
+    private String saveItemsToJson(){
+        List<IDoodleItem> items = mItemStack;
         List<DrawExtraElement> extraElements = new ArrayList<>();
         for (IDoodleItem item : items) {
             if (item instanceof DoodlePath){
@@ -671,7 +664,7 @@ public class DoodleView extends FrameLayout implements IDoodle {
         }
         Type listType = new TypeToken<List<DrawExtraElement>>() {}.getType();
         String json = new Gson().toJson(extraElements, listType);
-        SaveStore.saveString("DrawBaseElement", json, this.mContext);
+        return json;
     }
 
 
@@ -824,11 +817,11 @@ public class DoodleView extends FrameLayout implements IDoodle {
 
         mIsSaving = true;
 
-        new AsyncTask<Void, Void, Bitmap>() {
+        new AsyncTask<Void, Void, DoodleBitmapJson>() {
 
             @SuppressLint("WrongThread")
             @Override
-            protected Bitmap doInBackground(Void... voids) {
+            protected DoodleBitmapJson doInBackground(Void... voids) {
                 Bitmap savedBitmap = null;
 
                 if (mOptimizeDrawing) {
@@ -842,13 +835,14 @@ public class DoodleView extends FrameLayout implements IDoodle {
                     }
                 }
 
+                String json = saveItemsToJson();
                 savedBitmap = ImageUtils.rotate(savedBitmap, mDoodleRotateDegree, true);
-                return savedBitmap;
+                return new DoodleBitmapJson(savedBitmap, json);
             }
 
             @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                mDoodleListener.onSaved(DoodleView.this, bitmap, new Runnable() {
+            protected void onPostExecute(DoodleBitmapJson bitmap) {
+                mDoodleListener.onSaved(DoodleView.this, bitmap.getBitmap(), bitmap.getJson(), new Runnable() {
                     @Override
                     public void run() {
                         mIsSaving = false;

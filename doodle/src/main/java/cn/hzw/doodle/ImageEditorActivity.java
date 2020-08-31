@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -13,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -24,7 +22,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +52,6 @@ import cn.hzw.doodle.core.IDoodleTouchDetector;
 import cn.hzw.doodle.dialog.ColorPickerDialog;
 import cn.hzw.doodle.dialog.DialogController;
 import cn.hzw.doodle.imagepicker.ImageSelectorView;
-import cn.hzw.doodle.util.SaveStore;
 
 /**
  * 涂鸦界面，根据DoodleView的接口，提供页面交互
@@ -116,6 +112,7 @@ public class ImageEditorActivity extends Activity {
 
     public static final String KEY_PARAMS = "key_doodle_params";
     public static final String KEY_IMAGE_PATH = "key_image_path";
+    public static final String KEY_IMAGE_METADATA = "key_image_metadata";
 
     private String mImagePath;
 
@@ -208,7 +205,7 @@ public class ImageEditorActivity extends Activity {
          */
         mDoodle = mDoodleView = new DoodleViewWrapper(this, bitmap, mDoodleParams.mOptimizeDrawing, new IDoodleListener() {
             @Override
-            public void onSaved(IDoodle doodle, Bitmap bitmap, Runnable callback) { // 保存图片为jpg格式
+            public void onSaved(IDoodle doodle, Bitmap bitmap, String json,  Runnable callback) { // 保存图片为jpg格式
                 File doodleFile = null;
                 File file = null;
                 String savePath = mDoodleParams.mSavePath;
@@ -237,6 +234,7 @@ public class ImageEditorActivity extends Activity {
                     ImageUtils.addImage(getContentResolver(), file.getAbsolutePath());
                     Intent intent = new Intent();
                     intent.putExtra(KEY_IMAGE_PATH, file.getAbsolutePath());
+                    intent.putExtra(KEY_IMAGE_METADATA, json);
                     setResult(Activity.RESULT_OK, intent);
                     finish();
                 } catch (Exception e) {
@@ -281,7 +279,7 @@ public class ImageEditorActivity extends Activity {
                 mPenSizeMap.put(DoodlePen.BITMAP, DEFAULT_BITMAP_SIZE * mDoodle.getUnitSize());
 
                 //Load shapes if needed
-                String json = SaveStore.getString("DrawBaseElement", "", ImageEditorActivity.this);
+                String json = mDoodleParams.mImageMetadata;
                 if (!TextUtils.isEmpty(json)){
 
                     try{
@@ -496,6 +494,7 @@ public class ImageEditorActivity extends Activity {
         mSettingsPanel = findViewById(R.id.doodle_panel);
 
         mBtnHidePanel = findViewById(R.id.doodle_btn_hide_panel);
+        mBtnHidePanel.setVisibility(View.GONE);
 
         mShapeContainer = findViewById(R.id.shape_container);
         mPenContainer = findViewById(R.id.pen_container);
@@ -503,6 +502,7 @@ public class ImageEditorActivity extends Activity {
         mRedoBtn = findViewById(R.id.btn_redo);
         mBtnColor = ImageEditorActivity.this.findViewById(R.id.btn_set_color);
         mColorContainer = ImageEditorActivity.this.findViewById(R.id.btn_set_color_container);
+        mColorContainer.setVisibility(View.GONE);
         mDoodleView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -746,7 +746,7 @@ public class ImageEditorActivity extends Activity {
                 if (pen == DoodlePen.BITMAP) {
                     mColorContainer.setVisibility(GONE);
                 } else {
-                    mColorContainer.setVisibility(VISIBLE);
+                    //mColorContainer.setVisibility(VISIBLE);
                 }
             } else if (pen == DoodlePen.MOSAIC) {
                 mShapeContainer.setVisibility(VISIBLE);
@@ -756,7 +756,7 @@ public class ImageEditorActivity extends Activity {
                 if (pen == DoodlePen.COPY || pen == DoodlePen.ERASER) {
                     mColorContainer.setVisibility(GONE);
                 } else {
-                    mColorContainer.setVisibility(VISIBLE);
+                    //mColorContainer.setVisibility(VISIBLE);
                 }
             }
             setSingleSelected(mBtnPenIds.values(), mBtnPenIds.get(pen));

@@ -13,7 +13,7 @@
 
         <include
             android:id="@+id/doodle_title_bar"
-            layout="@layout/doodle_title_bar" />
+            layout="@layout/editor_title_bar" />
 
         <FrameLayout
             android:id="@+id/doodle_container"

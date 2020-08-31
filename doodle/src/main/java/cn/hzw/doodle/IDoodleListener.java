@@ -18,7 +18,7 @@ public interface IDoodleListener {
      * @param doodleBitmap       涂鸦后的图片
      * @param callback  called after saving the bitmap, if you continue to doodle. 保存后的回调，如果需要继续涂鸦，必须调用该回调
      */
-    void onSaved(IDoodle doodle, Bitmap doodleBitmap, Runnable callback);
+    void onSaved(IDoodle doodle, Bitmap doodleBitmap, String json, Runnable callback);
 
     /**
      * called when it is ready to doodle because the view has been measured. Now, you can set size, color, pen, shape, etc.

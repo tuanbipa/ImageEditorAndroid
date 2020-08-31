@@ -82,6 +82,7 @@ public class MainActivity extends Activity {
                 params.mPaintColor = Color.RED;
                 // 是否支持缩放item
                 params.mSupportScaleItem = true;
+                params.mImageMetadata = null;
                 // 启动涂鸦页面
                 //DoodleActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
 

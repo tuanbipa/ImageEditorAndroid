@@ -193,9 +193,9 @@ public class DoodleActivity extends Activity {
         是否优化绘制，建议开启，可优化绘制速度和性能.
         注意：开启后item被选中编辑时时会绘制在最上面一层，直到结束编辑后才绘制在相应层级
          */
-        mDoodle = mDoodleView = new DoodleViewWrapper(this, bitmap, mDoodleParams.mOptimizeDrawing, new IDoodleListener() {
+        mDoodle = mDoodleView = new DoodleViewWrapper(this, bitmap, mDoodleParams.mOptimizeDrawing,  new IDoodleListener() {
             @Override
-            public void onSaved(IDoodle doodle, Bitmap bitmap, Runnable callback) { // 保存图片为jpg格式
+            public void onSaved(IDoodle doodle, Bitmap bitmap, String json,  Runnable callback) { // 保存图片为jpg格式
                 File doodleFile = null;
                 File file = null;
                 String savePath = mDoodleParams.mSavePath;
