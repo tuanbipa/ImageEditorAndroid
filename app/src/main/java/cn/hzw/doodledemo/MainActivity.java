@@ -83,9 +83,9 @@ public class MainActivity extends Activity {
                 // 是否支持缩放item
                 params.mSupportScaleItem = true;
                 // 启动涂鸦页面
-                //DoodleActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
+                DoodleActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
 
-                ImageEditorActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
+                //ImageEditorActivity.startActivityForResult(MainActivity.this, params, REQ_CODE_DOODLE);
             }
         } else if (requestCode == REQ_CODE_DOODLE) {
             if (data == null) {

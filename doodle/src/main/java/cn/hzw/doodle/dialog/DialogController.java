@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -121,7 +122,7 @@ public class DialogController {
 
         final EditText textView = (EditText) container.findViewById(R.id.doodle_selectable_edit);
         final View cancelBtn = container.findViewById(R.id.doodle_text_cancel_btn);
-        final TextView enterBtn = (TextView) container.findViewById(R.id.doodle_text_enter_btn);
+        final Button enterBtn = (Button) container.findViewById(R.id.btSaveText);
 
         textView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -131,14 +132,14 @@ public class DialogController {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String text = (textView.getText() + "").trim();
-                if (TextUtils.isEmpty(text)) {
-                    enterBtn.setEnabled(false);
-                    enterBtn.setTextColor(0xffb3b3b3);
-                } else {
-                    enterBtn.setEnabled(true);
-                    enterBtn.setTextColor(0xff232323);
-                }
+//                String text = (textView.getText() + "").trim();
+//                if (TextUtils.isEmpty(text)) {
+//                    enterBtn.setEnabled(false);
+//                    enterBtn.setTextColor(0xffb3b3b3);
+//                } else {
+//                    enterBtn.setEnabled(true);
+//                    enterBtn.setTextColor(0xff232323);
+//                }
             }
 
             @Override

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#99000000"
+    >
 
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical">
-
+        android:layout_height="wrap_content">
         <EditText
+            android:gravity="center"
+            android:layout_above="@+id/flControl"
             android:id="@+id/doodle_selectable_edit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom"
             android:background="#88000000"
             android:padding="10dp"
@@ -21,6 +21,9 @@
             android:textSize="26dp" />
 
         <FrameLayout
+            android:visibility="gone"
+            android:id="@+id/flControl"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="bottom"
@@ -51,5 +54,19 @@
                 android:textColor="#232323"
                 android:textSize="16dp" />
         </FrameLayout>
-    </LinearLayout>
-</FrameLayout>
+
+        <Button
+            android:id="@+id/btSaveText"
+            android:layout_margin="10dp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/transparent_bg_bordered_button"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="Done"
+            android:layout_width="100dp"
+            android:layout_height="50dp">
+        </Button>
+    </RelativeLayout>
+
+
+</RelativeLayout>
