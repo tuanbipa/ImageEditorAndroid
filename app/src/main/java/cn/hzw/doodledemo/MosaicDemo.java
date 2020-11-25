@@ -36,7 +36,7 @@ public class MosaicDemo extends Activity {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.thelittleprince2);
         doodleView = new DoodleView(this, bitmap, new IDoodleListener() {
             @Override
-            public void onSaved(IDoodle doodle, Bitmap doodleBitmap, Runnable callback) {
+            public void onSaved(IDoodle doodle, Bitmap doodleBitmap, String json, Runnable callback) {
                 Toast.makeText(MosaicDemo.this, "onSaved", Toast.LENGTH_SHORT).show();
             }
 

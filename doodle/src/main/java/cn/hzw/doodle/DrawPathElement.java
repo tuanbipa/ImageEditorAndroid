@@ -1,14 +1,6 @@
 package cn.hzw.doodle;
 
-import java.util.List;
-
-import cn.hzw.doodle.core.IDoodleColor;
-import cn.hzw.doodle.core.IDoodleItem;
-import cn.hzw.doodle.core.IDoodlePen;
-import cn.hzw.doodle.core.IDoodleShape;
-
-public class SavingObject {
-
+public class DrawPathElement extends DrawExtraElement {
     private String mPen; // 画笔类型
     private String mShape; // 画笔形状
     float size;
@@ -18,7 +10,7 @@ public class SavingObject {
     float dx;
     float dy;
 
-    public SavingObject(String mPen, String mShape, float size, int color, float sx, float sy, float dx, float dy) {
+    public DrawPathElement(String mPen, String mShape, float size, int color, float sx, float sy, float dx, float dy) {
         this.mPen = mPen;
         this.mShape = mShape;
         this.size = size;
@@ -27,6 +19,7 @@ public class SavingObject {
         this.sy = sy;
         this.dx = dx;
         this.dy = dy;
+        this.setType("shape");
     }
 
     public String getmPen() {
