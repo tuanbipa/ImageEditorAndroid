@@ -74,7 +74,7 @@ public class DoodleView extends FrameLayout implements IDoodle {
     public static final String TAG = "DoodleView";
     public final static float MAX_SCALE = 5f; // 最大缩放倍数
     public final static float MIN_SCALE = 0.25f; // 最小缩放倍数
-    public final static int DEFAULT_SIZE = 3; // 默认画笔大小
+    public final static int DEFAULT_SIZE = 10; // 默认画笔大小
 
     public static final int ERROR_INIT = -1;
     public static final int ERROR_SAVE = -2;

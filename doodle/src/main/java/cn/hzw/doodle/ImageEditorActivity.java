@@ -112,6 +112,7 @@ public class ImageEditorActivity extends Activity {
 
     public static final String KEY_PARAMS = "key_doodle_params";
     public static final String KEY_IMAGE_PATH = "key_image_path";
+    public static final String KEY_ORIGINAL_PATH = "key_original_path";
     public static final String KEY_IMAGE_METADATA = "key_image_metadata";
 
     private String mImagePath;
@@ -206,26 +207,18 @@ public class ImageEditorActivity extends Activity {
         mDoodle = mDoodleView = new DoodleViewWrapper(this, bitmap, mDoodleParams.mOptimizeDrawing, new IDoodleListener() {
             @Override
             public void onSaved(IDoodle doodle, Bitmap bitmap, String json,  Runnable callback) { // 保存图片为jpg格式
-                File doodleFile = null;
                 File file = null;
                 String savePath = mDoodleParams.mSavePath;
-                boolean isDir = mDoodleParams.mSavePathIsDir;
                 if (TextUtils.isEmpty(savePath)) {
+                    File doodleFile = null;
                     File dcimFile = new File(Environment.getExternalStorageDirectory(), "DCIM");
                     doodleFile = new File(dcimFile, "Doodle");
                     //　保存的路径
                     file = new File(doodleFile, System.currentTimeMillis() + ".jpg");
+                    doodleFile.mkdirs();
                 } else {
-                    if (isDir) {
-                        doodleFile = new File(savePath);
-                        //　保存的路径
-                        file = new File(doodleFile, System.currentTimeMillis() + ".jpg");
-                    } else {
-                        file = new File(savePath);
-                        doodleFile = file.getParentFile();
-                    }
+                    file = new File(savePath);
                 }
-                doodleFile.mkdirs();
 
                 FileOutputStream outputStream = null;
                 try {
@@ -234,6 +227,7 @@ public class ImageEditorActivity extends Activity {
                     ImageUtils.addImage(getContentResolver(), file.getAbsolutePath());
                     Intent intent = new Intent();
                     intent.putExtra(KEY_IMAGE_PATH, file.getAbsolutePath());
+                    intent.putExtra(KEY_ORIGINAL_PATH, mDoodleParams.mImagePath);
                     intent.putExtra(KEY_IMAGE_METADATA, json);
                     setResult(Activity.RESULT_OK, intent);
                     finish();
